@@ -1,0 +1,26 @@
+name: Security Scan
+
+on:
+  push:
+    branches: [ "main" ]  # Skonuj przy każdym pushu do gałęzi main
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  trivy-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4  # Pobiera Twój kod na maszynę wirtualną
+
+      - name: Build local image
+        run: |
+          docker build -t myapp:latest .
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'myapp:latest'
+          format: 'table'
+          exit-code: '1'       # Zatrzymuje pipeline, jeśli znajdzie błędy
+          severity: 'CRITICAL,HIGH'

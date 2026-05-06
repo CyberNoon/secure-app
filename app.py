@@ -4,6 +4,8 @@ from flask import Flask
 
 app = Flask(__name__)
 
+# AWS_SECRET_ACCESS_KEY=AKIAIMNO789876543210
+# ghp_ToJestFejkowyTokenAleTrivyGoZlapie12345
 # Pobieranie sekretów z Environment Variables
 DB_USER = os.getenv('DB_USER', 'Nieznany')
 APP_SECRET = os.getenv('MY_APP_SECRET', 'Brak klucza!')

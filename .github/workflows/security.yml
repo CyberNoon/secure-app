@@ -2,7 +2,7 @@ name: Security Scan
 
 on:
   push:
-    branches: [ "main" ]  # Skonuj przy każdym pushu do gałęzi main
+    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
 
@@ -11,16 +11,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4  # Pobiera Twój kod na maszynę wirtualną
+        uses: actions/checkout@v4
 
       - name: Build local image
+        # Kropka na końcu oznacza obecny folder, gdzie teraz jest Dockerfile
         run: |
           docker build -t myapp:latest .
 
-      - name: Run Trivy vulnerability scanner
+      - name: Run Trivy vulnerability scanner (Image)
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: 'myapp:latest'
           format: 'table'
-          exit-code: '1'       # Zatrzymuje pipeline, jeśli znajdzie błędy
+          exit-code: '1'
           severity: 'CRITICAL,HIGH'
+
+      - name: Run Trivy Secrets scanner (FS)
+        # To przeskanuje Twój kod pod kątem haseł (app.py, docker-compose.yml)
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          security-checks: 'secret'
+          exit-code: '0' # Zmieniamy na 0, żeby pipeline nie wybuchł od razu, 
+                         # bo masz wpisane hasła w plikach!

@@ -1,0 +1,27 @@
+# .github/workflows/security.yml
+name: Security Scan
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  trivy-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build local image
+        run: |
+          docker build -t myapp:latest ./api
+
+      - name: Run Trivy Security Scan (Full Report)
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scanners: 'vuln,secret' 
+          exit-code: '1'  # Wybuchnie (błąd budowania), jeśli znajdzie CRITICAL/HIGH podatności lub sekrety
+          severity: 'CRITICAL,HIGH'
